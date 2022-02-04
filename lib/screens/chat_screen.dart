@@ -12,6 +12,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  final messageTextController = TextEditingController();
   FirebaseAuth _auth = FirebaseAuth.instance;
   late User loggedInUser;
   String messageText = '';
@@ -34,18 +35,30 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  void getMessages() async {
-    var list = [];
-    final messages = await _firebaseFirestore.collection('messages').get();
+  // void getMessages() async {
+  //   var list = [];
+  //   final messages = await _firebaseFirestore.collection('messages').get();
 
-    var message = messages.docs;
-    for (var element in message) {
-      print(element.data());
-      print(element.id);
-      list.add(element.data());
+  //   var message = messages.docs;
+  //   for (var element in message) {
+  //     // print(element.data());
+  //     // print(element.id);
+  //     list.add(element.data());
+  //   }
+
+  //   list.forEach((element) {
+  //     print(element);
+  //   });
+  // }
+  void messagesStream() async {
+    await for (var snapshot
+        in _firebaseFirestore.collection('messages').snapshots()) {
+      var messages = snapshot.docs;
+      for (var item in messages) {
+        print(item.data());
+      }
+      print('loop ends');
     }
-
-    print(list);
   }
 
   @override
@@ -60,7 +73,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 //Implement logout functionality
                 // await _auth.signOut();
                 // Navigator.pop(context);
-                getMessages();
+                // getMessages();
+                messagesStream();
               }),
         ],
         title: Text('⚡️Chat'),
@@ -71,6 +85,7 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            MessagesStream(firebaseFirestore: _firebaseFirestore),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -78,8 +93,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
+                      controller: messageTextController,
                       onChanged: (value) {
-                        //Do something with the user input.
                         messageText = value;
                       },
                       decoration: kMessageTextFieldDecoration,
@@ -87,7 +102,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   FlatButton(
                     onPressed: () {
-                      //messageText + loggedinUser.email
+                      messageTextController.clear();
                       _firebaseFirestore.collection('messages').add(
                           {'text': messageText, 'sender': loggedInUser.email});
                     },
@@ -101,6 +116,83 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class MessagesStream extends StatelessWidget {
+  const MessagesStream({
+    Key? key,
+    required FirebaseFirestore firebaseFirestore,
+  })  : _firebaseFirestore = firebaseFirestore,
+        super(key: key);
+
+  final FirebaseFirestore _firebaseFirestore;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _firebaseFirestore.collection('messages').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final messages = snapshot.data;
+          final message = messages?.docs;
+          List<MessageBubble> messageBubbles = [];
+
+          for (var item in message!) {
+            final messageText = item['text'];
+            final messageSender = item['sender'];
+            final messageBubble = MessageBubble(messageSender, messageText);
+            messageBubbles.add(messageBubble);
+          }
+          return Expanded(
+            flex: 8,
+            child: ListView(
+              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+              children: messageBubbles,
+            ),
+          );
+        }
+
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
+}
+
+class MessageBubble extends StatelessWidget {
+  final String sender;
+  final String text;
+
+  const MessageBubble(this.sender, this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            sender,
+            style: TextStyle(color: Colors.grey),
+          ),
+          Material(
+            borderRadius: BorderRadius.circular(30),
+            elevation: 5,
+            color: Colors.blueAccent,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: Text(
+                text,
+                style: TextStyle(fontSize: 20, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
