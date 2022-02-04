@@ -1,8 +1,9 @@
 // ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, todo, unused_import, prefer_const_constructors_in_immutables
 
-import 'package:flash_chat/components/rounded_buttons.dart';
-import 'package:flash_chat/screens/login_screen.dart';
-import 'package:flash_chat/screens/registration_screen.dart';
+
+import 'package:flash_chat/flash_chat_app/components/rounded_buttons.dart';
+import 'package:flash_chat/flash_chat_app/screens/login_screen.dart';
+import 'package:flash_chat/flash_chat_app/screens/registration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 

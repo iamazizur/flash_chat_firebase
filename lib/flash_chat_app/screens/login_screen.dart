@@ -1,8 +1,8 @@
 // ignore_for_file: sized_box_for_whitespace, prefer_const_constructors, use_key_in_widget_constructors, unused_import, unused_field, prefer_final_fields, unused_local_variable, avoid_print, non_constant_identifier_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flash_chat/components/rounded_buttons.dart';
-import 'package:flash_chat/screens/chat_screen.dart';
+import 'package:flash_chat/flash_chat_app/components/rounded_buttons.dart';
+import 'package:flash_chat/flash_chat_app/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -46,7 +46,6 @@ class _LoginScreenState extends State<LoginScreen> {
             TextField(
               keyboardType: TextInputType.emailAddress,
               onChanged: (value) {
-                
                 email = value;
               },
               decoration:

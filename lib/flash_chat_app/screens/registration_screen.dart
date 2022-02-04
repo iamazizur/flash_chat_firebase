@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors, unused_import, prefer_final_fields, unused_field, sized_box_for_whitespace, avoid_print
 
-import 'package:flash_chat/components/rounded_buttons.dart';
-import 'package:flash_chat/screens/chat_screen.dart';
+import 'package:flash_chat/flash_chat_app/components/rounded_buttons.dart';
+import 'package:flash_chat/flash_chat_app/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -63,14 +63,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               color: Colors.blueAccent,
               name: 'Register',
               onPress: () async {
-                
                 try {
                   final newUser = await _auth.createUserWithEmailAndPassword(
                       email: email, password: password);
                   if (newUser != null) {
                     Navigator.pushNamed(context, ChatScreen.id);
                   }
-                  
                 } catch (e) {
                   print(e);
                 }
